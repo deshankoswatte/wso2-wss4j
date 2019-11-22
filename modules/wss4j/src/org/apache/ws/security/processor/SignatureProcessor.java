@@ -61,8 +61,7 @@ import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.Transforms;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml1.core.Assertion;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -681,8 +680,8 @@ public class SignatureProcessor implements Processor {
                     principal.setBasetokenId(basetokenId);
                     return principal;
                 } else if (samlKi != null) {
-                    final SAMLAssertion assertion = samlKi.getAssertion();
-                    CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getId());
+                    final Assertion assertion = samlKi.getAssertion();
+                    CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getID());
                     principal.setTokenObject(assertion);
                     return principal;
                     

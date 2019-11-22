@@ -45,11 +45,11 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLException;
-import org.opensaml.SAMLObject;
-import org.opensaml.SAMLSubject;
-import org.opensaml.SAMLSubjectStatement;
+
+import org.opensaml.saml.common.SAMLObject;
+import org.opensaml.saml.saml1.core.Assertion;
+import org.opensaml.saml.saml1.core.Subject;
+import org.opensaml.saml.saml1.core.SubjectStatement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -108,11 +108,11 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws org.apache.ws.security.WSSecurityException
      * @deprecated replaced by
-     *             {@link WSSecSignatureSAML#build(Document, Crypto, SAMLAssertion, Crypto, String, String, WSSecHeader)}
+     *             {@link WSSecSignatureSAML#build(Document, Crypto, Assertion, Crypto, String, String, WSSecHeader)}
      */
     public Document build(Document doc, Crypto userCrypto,
-            SAMLAssertion assertion, Crypto issuerCrypto, String issuerKeyName,
-            String issuerKeyPW) throws WSSecurityException {
+                          Assertion assertion, Crypto issuerCrypto, String issuerKeyName,
+                          String issuerKeyPW) throws WSSecurityException {
 
         doDebug = log.isDebugEnabled();
 
@@ -128,16 +128,16 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
          * to deal with the whole stuff. First get the Authentication statement
          * (includes Subject), then get the _first_ confirmation method only.
          */
-        SAMLSubjectStatement samlSubjS = null;
-        Iterator it = assertion.getStatements();
+        SubjectStatement samlSubjS = null;
+        Iterator it = assertion.getStatements().iterator();
         while (it.hasNext()) {
             SAMLObject so = (SAMLObject) it.next();
-            if (so instanceof SAMLSubjectStatement) {
-                samlSubjS = (SAMLSubjectStatement) so;
+            if (so instanceof SubjectStatement) {
+                samlSubjS = (SubjectStatement) so;
                 break;
             }
         }
-        SAMLSubject samlSubj = null;
+        Subject samlSubj = null;
         if (samlSubjS != null) {
             samlSubj = samlSubjS.getSubject();
         }
@@ -147,12 +147,12 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         }
 
         String confirmMethod = null;
-        it = samlSubj.getConfirmationMethods();
+        it = samlSubj.getSubjectConfirmation().getConfirmationMethods().iterator();
         if (it.hasNext()) {
             confirmMethod = (String) it.next();
         }
         boolean senderVouches = false;
-        if (SAMLSubject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
+        if (Subject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
             senderVouches = true;
         }
         /*
@@ -183,7 +183,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                         "invalidSAMLsecurity",
                         new Object[] { "for SAML Signature (Key Holder)" });
             }
-            Element e = samlSubj.getKeyInfo();
+            Element e = (Element) samlSubj.getDOM().getAttributeNode("KeyInfo");
             try {
                 KeyInfo ki = new KeyInfo(e, null);
 
@@ -284,7 +284,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                 secRefSaml.setID(strSamlUri);
                 // Decouple Refernce/KeyInfo setup - quick shot here
                 Reference ref = new Reference(doc);
-                ref.setURI("#" + assertion.getId());
+                ref.setURI("#" + assertion.getID());
                 ref.setValueType(WSConstants.WSS_SAML_NS
                         + WSConstants.WSS_SAML_ASSERTION);
                 secRefSaml.setReference(ref);
@@ -371,7 +371,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                 wsDocInfo.setBst(bstToken.getElement());
                 ref.setValueType(bstToken.getValueType());
             } else {
-                ref.setURI("#" + assertion.getId());
+                ref.setURI("#" + assertion.getID());
                 ref.setValueType(WSConstants.WSS_SAML_NS
                         + WSConstants.WSS_SAML_ASSERTION);
             }

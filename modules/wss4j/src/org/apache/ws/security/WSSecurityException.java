@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security;
 
+import javax.xml.namespace.QName;
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;

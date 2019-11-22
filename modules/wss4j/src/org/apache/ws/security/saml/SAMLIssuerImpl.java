@@ -31,12 +31,10 @@ import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
 import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 import org.apache.xml.security.signature.XMLSignature;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLAuthenticationStatement;
-import org.opensaml.SAMLException;
-import org.opensaml.SAMLNameIdentifier;
-import org.opensaml.SAMLStatement;
-import org.opensaml.SAMLSubject;
+
+import org.opensaml.saml.common.AbstractSAMLObject;
+import org.opensaml.saml.common.xml.SAMLConstants;
+import org.opensaml.saml.saml1.core.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -57,7 +55,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
 
     private static final Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
 
-    private SAMLAssertion sa = null;
+    private Assertion sa = null;
 
     private Document instanceDoc = null;
 
@@ -116,10 +114,11 @@ public class SAMLIssuerImpl implements SAMLIssuer {
 
         if ("senderVouches"
                 .equals(properties.getProperty("org.apache.ws.security.saml.confirmationMethod"))) {
-            confirmationMethods[0] = SAMLSubject.CONF_SENDER_VOUCHES;
+            confirmationMethods[0] = Subject.CONF_SENDER_VOUCHES;
+            SAMLConstants
         } else if (
                 "keyHolder".equals(properties.getProperty("org.apache.ws.security.saml.confirmationMethod"))) {
-            confirmationMethods[0] = SAMLSubject.CONF_HOLDER_KEY;
+            confirmationMethods[0] = Subject.CONF_HOLDER_KEY;
             senderVouches = false;
         } else {
             // throw something here - this is a mandatory property
@@ -127,15 +126,15 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     }
 
     /**
-     * Creates a new <code>SAMLAssertion</code>.
+     * Creates a new <code>Assertion</code>.
      * <p/>
      * <p/>
-     * A complete <code>SAMLAssertion</code> is constructed.
+     * A complete <code>Assertion</code> is constructed.
      *
-     * @return SAMLAssertion
+     * @return Assertion
      */
-    public SAMLAssertion newAssertion() { // throws Exception {
-        log.debug("Begin add SAMLAssertion token...");
+    public Assertion newAssertion() { // throws Exception {
+        log.debug("Begin add Assertion token...");
 
         /*
          * if (senderVouches == false && userCrypto == null) { throw
@@ -149,33 +148,33 @@ public class SAMLIssuerImpl implements SAMLIssuer {
         String qualifier =
                 properties.getProperty("org.apache.ws.security.saml.subjectNameId.qualifier");
         try {
-            SAMLNameIdentifier nameId =
-                    new SAMLNameIdentifier(name, qualifier, "");
+            NameIdentifier nameId =
+                    new AbstractSAMLObject(name, qualifier, "");
             String subjectIP = null;
             String authMethod = null;
             if ("password"
                     .equals(properties.getProperty("org.apache.ws.security.saml.authenticationMethod"))) {
                 authMethod =
-                        SAMLAuthenticationStatement.AuthenticationMethod_Password;
+                        AuthenticationStatement.PASSWORD_AUTHN_METHOD;
             }
             Date authInstant = new Date();
             Collection bindings = null;
 
-            SAMLSubject subject =
-                    new SAMLSubject(nameId,
+            Subject subject =
+                    new Subject(nameId,
                             Arrays.asList(confirmationMethods),
                             null,
                             null);
-            SAMLStatement[] statements =
+            Statement[] statements =
                     {
-                        new SAMLAuthenticationStatement(subject,
+                        new AuthenticationStatement(subject,
                                 authMethod,
                                 authInstant,
                                 subjectIP,
                                 null,
                                 bindings)};
             sa =
-                    new SAMLAssertion(issuer,
+                    new Assertion(issuer,
                             null,
                             null,
                             null,

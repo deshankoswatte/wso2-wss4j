@@ -21,8 +21,8 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLException;
+
+import org.opensaml.saml.saml1.core.Assertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -74,18 +74,18 @@ public class WSSAddSAMLToken extends WSBaseMessage {
     }
 
     /**
-     * Adds a new <code>SAMLAssertion</code> to a soap envelope.
+     * Adds a new <code>Assertion</code> to a soap envelope.
      * <p/>
-     * A complete <code>SAMLAssertion</code> is added to the
+     * A complete <code>Assertion</code> is added to the
      * <code>wsse:Security</code> header.
      *
      * @param doc      The SOAP enevlope as W3C document
      * @param assertion TODO
      * @return Document with UsernameToken added
-     * @deprecated replaced by {@link WSSecSAMLToken#build(Document, SAMLAssertion, WSSecHeader)}
+     * @deprecated replaced by {@link WSSecSAMLToken#build(Document, Assertion, WSSecHeader)}
      */
-    public Document build(Document doc, SAMLAssertion assertion) {
-        log.debug("Begin add SAMLAssertion token...");
+    public Document build(Document doc, Assertion assertion) {
+        log.debug("Begin add Assertion token...");
         try {
             Element element = (Element) assertion.toDOM(doc);
             Element securityHeader = insertSecurityHeader(doc);
