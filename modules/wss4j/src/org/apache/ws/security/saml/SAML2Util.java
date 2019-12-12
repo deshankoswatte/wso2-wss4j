@@ -53,15 +53,15 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.saml.saml1.core.Assertion;
-import org.opensaml.saml.saml1.core.Attribute;
-import org.opensaml.saml.saml1.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml1.core.Conditions;
 import org.opensaml.saml.saml2.core.KeyInfoConfirmationDataType;
-import org.opensaml.saml.saml1.core.Subject;
-import org.opensaml.saml.saml1.core.SubjectConfirmation;
-import org.opensaml.saml.saml1.core.SubjectConfirmationData;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.Marshaller;
 import org.opensaml.core.xml.io.MarshallerFactory;
@@ -178,7 +178,7 @@ public class SAML2Util {
                 }
 
                 // extract the subject confirmation element from the subject
-                SubjectConfirmation subjectConf =  samlSubject.getSubjectConfirmation();
+                SubjectConfirmation subjectConf = samlSubject.getSubjectConfirmations().get(0);
                 if (subjectConf == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
                             "invalidSAML2Token", new Object[]{"for Signature (no Subject Confirmation)"});
@@ -222,8 +222,8 @@ public class SAML2Util {
 
                 AttributeStatement attrStmt = assertion.getAttributeStatements().size() != 0 ?
                         assertion.getAttributeStatements().get(0) : null;
-                AuthnStatement authnStmt = assertion.getAuthenticationStatements().size() != 0 ?
-                        (AuthnStatement) assertion.getAuthenticationStatements().get(0) : null;
+                AuthnStatement authnStmt = assertion.getAuthnStatements().size() != 0 ?
+                        assertion.getAuthnStatements().get(0) : null;
                         
                 boolean usePublicKey = false;
 
@@ -338,7 +338,7 @@ public class SAML2Util {
        public static Timestamp getTimestampForSAMLAssertion(Assertion assertion) throws WSSecurityException {
 
         Subject subject = assertion.getSubject();
-        SubjectConfirmationData scData = (SubjectConfirmationData) subject.getSubjectConfirmation().getSubjectConfirmationData();
+        SubjectConfirmationData scData = (subject.getSubjectConfirmations().get(0)).getSubjectConfirmationData();
 
         String notBefore = null;
         String notOnOrAfter = null;
@@ -401,7 +401,7 @@ public class SAML2Util {
                     attrStmtIndex);
             List attributes  = attributeStatement.getAttributes();
             for(int attrIndex = 0 ; attrIndex < attributes.size(); attrIndex++){
-                claimSet.add(((Attribute)attributes.get(attrIndex)).getAttributeName());
+                claimSet.add(((Attribute)attributes.get(attrIndex)).getName());
             }
         }
         return claimSet;

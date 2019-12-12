@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.opensaml.SAMLException;
 import org.opensaml.saml.saml1.core.Assertion;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -76,13 +76,9 @@ public class WSSecSAMLToken extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        Element element = null;        
-        try {
-            element = (Element) saml.toDOM(document);
-        } catch (SAMLException ex) {
-            throw new RuntimeException(ex.toString(), ex);
-        }
-        
+
+        document.getDocumentElement();
+        Element element = saml.getDOM();
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
     }
     

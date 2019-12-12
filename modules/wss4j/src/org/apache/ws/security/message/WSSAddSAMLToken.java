@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.opensaml.saml.saml1.core.Assertion;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -86,16 +87,9 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      */
     public Document build(Document doc, Assertion assertion) {
         log.debug("Begin add Assertion token...");
-        try {
-            Element element = (Element) assertion.toDOM(doc);
-            Element securityHeader = insertSecurityHeader(doc);
-            WSSecurityUtil.prependChildElement(securityHeader, element);
-        } catch (SAMLException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
-            }
-            throw new RuntimeException(ex.toString(), ex);
-        }
+        Element element = assertion.getDOM();
+        Element securityHeader = insertSecurityHeader(doc);
+        WSSecurityUtil.prependChildElement(securityHeader, element);
         return doc;
     }
 }

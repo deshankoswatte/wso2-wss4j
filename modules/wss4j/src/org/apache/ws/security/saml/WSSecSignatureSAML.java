@@ -54,6 +54,7 @@ import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.saml1.core.Subject;
 import org.opensaml.saml.saml1.core.SubjectStatement;
 import org.opensaml.saml.saml1.core.Assertion;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -219,7 +220,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         if (it.hasNext()) {
             confirmMethod = (String) it.next();
         }
-        if (org.opensaml.saml.saml1.core.Subject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
+        if ("urn:oasis:names:tc:SAML:1.0:cm:sender-vouches".equals(confirmMethod)) {
             senderVouches = true;
         }
         //
@@ -468,13 +469,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
         );
 
-        try {
-            samlToken = (Element) assertion.toDOM(doc);
-        } catch (SAMLException e2) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, e2
-            );
-        }
+        samlToken = assertion.getDOM();
         wsDocInfo.setAssertion(samlToken);
     }
 

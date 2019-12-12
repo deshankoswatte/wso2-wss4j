@@ -61,7 +61,9 @@ import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.Transforms;
+
 import org.opensaml.saml.saml1.core.Assertion;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -686,7 +688,7 @@ public class SignatureProcessor implements Processor {
                     return principal;
                     
 				} else if (saml2Ki != null) {
-					Assertion assertion = saml2Ki.getAssertion();
+					org.opensaml.saml.saml2.core.Assertion assertion = saml2Ki.getAssertion();
 					CustomTokenPrincipal principal = new CustomTokenPrincipal(
 							assertion.getID());
 					principal.setTokenObject(assertion);
@@ -748,10 +750,10 @@ public class SignatureProcessor implements Processor {
         String type = element.getAttribute("ValueType");
         if (X509Security.X509_V3_TYPE.equals(type)) {
             X509Security x509 = new X509Security(element);
-            return (BinarySecurity) x509;
+            return x509;
         } else if (PKIPathSecurity.getType().equals(type)) {
             PKIPathSecurity pkiPath = new PKIPathSecurity(element);
-            return (BinarySecurity) pkiPath;
+            return pkiPath;
         }
         throw new WSSecurityException(
             WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,

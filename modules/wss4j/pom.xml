@@ -474,11 +474,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml1</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
             <scope>provided</scope>

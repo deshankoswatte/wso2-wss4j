@@ -52,21 +52,21 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        Assertion assertion = handleSAMLToken((Element) elem);
+        Assertion assertion = handleSAMLToken(elem);
         // validate the signature of the token against the Signature Crypto
         if(assertion.isSigned()){
             SAMLUtil.validateSignature(assertion, crypto);
         }
 
         this.id = assertion.getID();
-        wsDocInfo.setAssertion((Element) elem);
+        wsDocInfo.setAssertion(elem);
         WSSecurityEngineResult wsSecurityEngineResult = new WSSecurityEngineResult(
                 WSConstants.ST_UNSIGNED, assertion);
         returnResults.add(0, wsSecurityEngineResult);
         //set the SAML version
         wsSecurityEngineResult.put(WSConstants.SAML_VERSION, WSConstants.SAML_NS);
         // Adding a timeStamp element for validating the SAMLToken
-        returnResults.add(0, new WSSecurityEngineResult(WSConstants.SAML_TIMESTAMP, SAMLUtil.getTimestampForAssertion(elem)));
+        returnResults.add(0, new WSSecurityEngineResult(WSConstants.SAML_TIMESTAMP, SAMLUtil.getTimestampForSAMLAssertion(elem)));
         // Adding the token issuer name
         wsSecurityEngineResult.put(WSConstants.SAML_ISSUER_NAME, assertion.getIssuer());
         // Adding the set of attributes included in a SAML assertion
